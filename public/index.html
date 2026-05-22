@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --bg-color: #0f172a;
+            --surface: rgba(30, 41, 59, 0.7);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism App Container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 90vh;
+            max-height: 800px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.4);
+            z-index: 10;
+        }
+
+        .header-info h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-info p {
+            font-size: 0.8rem;
+            color: var(--success, #10b981);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Messages Area */
+        .messages-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Message Bubbles */
+        .message-wrapper {
+            display: flex;
+            width: 100%;
+            animation: slideUp 0.3s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-wrapper.sent {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper.received {
+            justify-content: flex-start;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        .message.received {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+        }
+
+        .time {
+            font-size: 0.65rem;
+            margin-top: 6px;
+            opacity: 0.7;
+            text-align: right;
+            display: block;
+        }
+
+        /* Input Area */
+        .input-container {
+            padding: 20px 24px;
+            background: rgba(30, 41, 59, 0.6);
+            border-top: 1px solid var(--surface-border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-box {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--surface-border);
+            border-radius: 999px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-box:focus {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .input-box::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+        }
+
+        .send-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            margin-left: 2px;
+            /* optical alignment */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-info">
+                <h1>Communication</h1>
+                <p><span class="status-dot"></span> Online Now</p>
+            </div>
+        </header>
+
+        <!-- Chat Stream -->
+        <div class="messages-container" id="messages">
+            <!-- Messages will be injected here -->
+        </div>
+
+        <!-- Input Dock -->
+        <div class="input-container">
+            <input type="text" id="message" class="input-box" placeholder="Type a message..." autocomplete="off"
+                autofocus>
+            <button id="sendBtn" class="send-btn">
+                <svg viewBox="0 0 24 24">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Generate a random ID for the current user so we can distinguish our own messages
+        const myUserId = Math.random().toString(36).substring(7);
+
+        const sendBtn = document.getElementById("sendBtn");
+        const messageInput = document.getElementById("message");
+        const messagesContainer = document.getElementById("messages");
+
+        // Format time nicely
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Add a message to the UI
+        function appendMessage(text, isMine) {
+            const wrapper = document.createElement("div");
+            wrapper.className = `message-wrapper ${isMine ? 'sent' : 'received'}`;
+
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${isMine ? 'sent' : 'received'}`;
+            messageDiv.textContent = text;
+
+            const timeSpan = document.createElement("span");
+            timeSpan.className = "time";
+            timeSpan.textContent = getCurrentTime();
+
+            messageDiv.appendChild(timeSpan);
+            wrapper.appendChild(messageDiv);
+            messagesContainer.appendChild(wrapper);
+
+            // Auto-scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Send Message Handler
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (text) {
+                // We emit an object containing the text and our user ID
+                socket.emit("message", { text: text, senderId: myUserId });
+                messageInput.value = "";
+                messageInput.focus();
+            }
+        }
+
+        sendBtn.addEventListener("click", sendMessage);
+
+        // Allow pressing Enter to send
+        messageInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // Receive messages from server
+        socket.on("message", (data) => {
+            // The server might be echoing plain strings from old clients, 
+            // or objects from our new client. Let's handle both.
+            let text = "";
+            let isMine = false;
+
+            if (typeof data === 'object' && data.text) {
+                text = data.text;
+                isMine = (data.senderId === myUserId);
+            } else {
+                // Fallback for simple string messages
+                text = data;
+                isMine = false; // We can't know for sure, assume received
+            }
+
+            appendMessage(text, isMine);
+        });
+
+    </script>
+</body>
+
+</html>
